@@ -1,5 +1,5 @@
 // Service worker Stok Gudang. Naikkan VERSI setiap file statis (ikon/manifest) berubah.
-const VERSI = 'stok-staf-v1';
+const VERSI = 'stok-staf-v2';
 const CDN = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js';
 const SHELL = ['./', 'index.html', 'manifest.json', 'icon-192.png'];
 
