@@ -75,7 +75,7 @@ const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const TABS = [['stok','Stok','📦'],['MASUK','Masuk','⬇️'],['KELUAR','Keluar','⬆️'],['RETUR','Retur','↩️'],['OPNAME','Opname','📋']];
 const TITLE = {MASUK:'Barang masuk',KELUAR:'Barang keluar',RETUR:'Retur barang',OPNAME:'Stok opname'};
-const S = {user:null, products:[], loading:true, tab:'stok', q:'', sel:null, qty:1, photo:null};
+const S = {user:null, products:[], loading:true, tab:'stok', q:'', sel:null, qty:1, photo:null, authMode:'login'};
 
 // ---- IndexedDB: katalog cache + antrean offline ----
 const dbp = new Promise((res, rej) => {
@@ -143,9 +143,20 @@ async function sync() {
 
 // ---- tampilan ----
 function loginView() {
-  $('#app').innerHTML = `<div class="login"><h2>Stok Gudang</h2><label>Email</label><input id="em" type="email" autocomplete="username">
-  <label>Kata sandi</label><input id="pw" type="password" autocomplete="current-password"><p class="err" id="le"></p>
-  <button class="save" data-a="login">Masuk</button></div>`;
+  const reg = S.authMode === 'register';
+  $('#app').innerHTML = `<div class="login"><h2>Stok Gudang</h2>` + (reg ? `
+  <label>Nama</label><input id="rn" type="text" autocomplete="name">
+  <label>Email</label><input id="rem" type="email" autocomplete="username">
+  <label>Kata sandi</label><input id="rpw" type="password" autocomplete="new-password">
+  <label>Ulangi kata sandi</label><input id="rpw2" type="password" autocomplete="new-password">
+  <p class="err" id="le"></p>
+  <button class="save" data-a="register">Daftar</button>
+  <button class="ghost" data-a="toauth" data-m="login">Sudah punya akun? Masuk</button>` : `
+  <label>Email</label><input id="em" type="email" autocomplete="username">
+  <label>Kata sandi</label><input id="pw" type="password" autocomplete="current-password">
+  <p class="err" id="le"></p>
+  <button class="save" data-a="login">Masuk</button>
+  <button class="ghost" data-a="toauth" data-m="register">Belum punya akun? Daftar</button>`) + `</div>`;
 }
 function shell() {
   $('#app').innerHTML = `<header><b>Stok Gudang</b><button class="pill" id="bar" data-a="queue"></button></header>
@@ -229,6 +240,19 @@ async function showQueue() {
 const act = {
   async login() { $('#le').textContent = ''; const {error} = await sb.auth.signInWithPassword({email:$('#em').value.trim(), password:$('#pw').value});
     if (error) $('#le').textContent = 'Email atau kata sandi salah'; },
+  toauth(a) { S.authMode = a.dataset.m; loginView(); },
+  async register() {
+    $('#le').textContent = '';
+    const name = $('#rn').value.trim(), email = $('#rem').value.trim(), pw = $('#rpw').value, pw2 = $('#rpw2').value;
+    if (!name) return $('#le').textContent = 'Nama wajib diisi';
+    if (!email) return $('#le').textContent = 'Email wajib diisi';
+    if (pw.length < 6) return $('#le').textContent = 'Kata sandi minimal 6 karakter';
+    if (pw !== pw2) return $('#le').textContent = 'Kata sandi tidak sama';
+    const {data, error} = await sb.auth.signUp({email, password: pw, options:{data:{name}}});
+    if (error) return $('#le').textContent = /registered|exists/i.test(error.message) ? 'Email ini sudah terdaftar, coba masuk' : error.message;
+    if (!data.session) { S.authMode = 'login'; loginView(); toast('Pendaftaran berhasil. Cek email untuk konfirmasi, lalu masuk.'); }
+    // kalau sesi langsung aktif (konfirmasi email dimatikan), onAuthStateChange akan otomatis masuk
+  },
   tab(a) { S.tab = a.dataset.k; S.sel = null; S.photo = null; S.qty = 1; renderTab(); },
   pick(a) { pick(a.dataset.id); }, clear() { S.sel = null; renderTab(); }, scan,
   inc() { const i = $('#qty'); i.value = (parseInt(i.value, 10) || 0) + 1; },
