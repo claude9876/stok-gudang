@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b5d4f">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Stok">
+<title>Stok Gudang</title>
+<style>
+:root{--bg:#f5f6f2;--card:#fff;--ink:#16211c;--mut:#66726c;--line:#dfe3dc;--pri:#0b5d4f;--priS:#d9ece7;--bad:#b4350f;--badS:#fbe6dd}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;margin:0}
+body{font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
+#app{height:100dvh;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
+header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--pri);color:#fff}
+header b{font-size:18px}
+.pill{border:0;border-radius:99px;padding:6px 12px;font:inherit;font-size:14px;background:rgba(255,255,255,.18);color:#fff}
+.pill.off{background:#f6c9b6;color:#6b2308}
+main{flex:1;overflow-y:auto;overscroll-behavior-y:contain;padding:16px}
+nav{display:grid;grid-template-columns:repeat(5,1fr);background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
+nav button{border:0;background:none;padding:10px 0 8px;font:inherit;font-size:13px;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px;min-height:56px}
+nav button span{font-size:20px}
+nav button.on{color:var(--pri);font-weight:600;box-shadow:inset 0 3px var(--pri)}
+h2{margin:0 0 12px;font-size:20px}
+input,select{width:100%;font:inherit;padding:13px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);margin-bottom:12px}
+label{display:block;font-size:14px;color:var(--mut);margin:4px 0 6px}
+button{font:inherit;cursor:pointer}
+.row{display:flex;gap:8px}.row input{flex:1}
+.scan{width:56px;height:50px;border:1px solid var(--pri);background:var(--priS);border-radius:10px;font-size:22px}
+.item{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;padding:14px;margin-bottom:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--ink)}
+.item small{display:block;color:var(--mut)}
+.stk{font-size:20px;font-weight:700;white-space:nowrap}.stk.low{color:var(--bad)}
+.card{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;margin-bottom:16px;background:var(--priS);border-radius:12px}
+.card small{display:block;color:var(--mut)}
+.card button{border:0;background:none;color:var(--pri);font-weight:600;padding:8px}
+.step{display:grid;grid-template-columns:72px 1fr 72px;gap:10px;margin-bottom:16px}
+.step button{height:72px;font-size:36px;border:0;border-radius:14px;background:var(--pri);color:#fff}
+.step input{height:72px;margin:0;text-align:center;font-size:32px;font-weight:700}
+.chk{display:flex;gap:10px;align-items:center;color:var(--ink);font-size:16px;margin:0 0 12px}
+.chk input{width:22px;height:22px;margin:0}
+.photo{display:flex;align-items:center;gap:8px;padding:14px;border:2px dashed var(--pri);border-radius:12px;color:var(--pri);font-size:16px;margin-bottom:12px}
+.photo input{display:none}
+.save{width:100%;height:58px;border:0;border-radius:14px;background:var(--pri);color:#fff;font-size:18px;font-weight:700;margin-top:4px}
+.save:disabled{opacity:.5}
+.sk{height:68px;margin-bottom:8px;border-radius:12px;background:linear-gradient(90deg,#e8ebe5 25%,#f3f5f0 50%,#e8ebe5 75%);background-size:200% 100%;animation:sh 1.2s infinite}
+@keyframes sh{to{background-position:-200% 0}}
+.login{margin:auto;width:min(360px,100%);padding:24px}
+.err{color:var(--bad);min-height:22px;margin:0 0 8px}
+.toast{position:fixed;left:16px;right:16px;bottom:84px;background:var(--ink);color:#fff;padding:12px 16px;border-radius:12px;z-index:30}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:20;display:flex;align-items:flex-end}
+.sheet{background:var(--bg);width:100%;max-height:80dvh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.sheet video{width:100%;border-radius:12px;background:#000;margin-bottom:12px}
+.q{padding:12px;margin-bottom:8px;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.q.bad{border-color:var(--bad);background:var(--badS)}
+.q .row{margin-top:8px}.q .row button{flex:1;padding:10px;border-radius:8px;border:1px solid var(--line);background:#fff}
+.ghost{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff;margin-top:8px}
+@media(prefers-reduced-motion:reduce){.sk{animation:none}}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script>
+// ====== ISI DUA NILAI INI (Supabase > Project Settings > API) ======
+const SB_URL = 'https://xqvzbvdotavwmtybzsgc.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxdnpidmRvdGF2d210eWJ6c2djIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExNzY2MTgsImV4cCI6MjEwNjc1MjYxOH0.DpfcAV6CdFPaGoBBGAP-InZ-d_chsNTpVK1rf43YHtQ';   // anon key (aman di frontend; data dilindungi RLS)
+// ===================================================================
+const sb = supabase.createClient(SB_URL || 'https://x.supabase.co', SB_KEY || 'x');
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const TABS = [['stok','Stok','📦'],['MASUK','Masuk','⬇️'],['KELUAR','Keluar','⬆️'],['RETUR','Retur','↩️'],['OPNAME','Opname','📋']];
+const TITLE = {MASUK:'Barang masuk',KELUAR:'Barang keluar',RETUR:'Retur barang',OPNAME:'Stok opname'};
+const S = {user:null, products:[], loading:true, tab:'stok', q:'', sel:null, qty:1, photo:null};
+
+// ---- IndexedDB: katalog cache + antrean offline ----
+const dbp = new Promise((res, rej) => {
+  const r = indexedDB.open('stok-gudang', 1);
+  r.onupgradeneeded = () => { r.result.createObjectStore('kv'); r.result.createObjectStore('q', {keyPath:'client_id'}); };
+  r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error);
+});
+const idb = async (st, mode, fn) => { const d = await dbp; return new Promise((res, rej) => {
+  const t = d.transaction(st, mode), req = fn(t.objectStore(st));
+  t.oncomplete = () => res(req && req.result); t.onerror = () => rej(t.error); }); };
+const kvGet = k => idb('kv','readonly',s => s.get(k)), kvSet = (k,v) => idb('kv','readwrite',s => s.put(v,k));
+const qAll = () => idb('q','readonly',s => s.getAll()), qPut = i => idb('q','readwrite',s => s.put(i)), qDel = id => idb('q','readwrite',s => s.delete(id));
+
+// ---- util ----
+let tt; const toast = m => { document.querySelectorAll('.toast').forEach(e => e.remove());
+  const d = document.createElement('div'); d.className = 'toast'; d.textContent = m; document.body.append(d);
+  clearTimeout(tt); tt = setTimeout(() => d.remove(), 3200); };
+const nice = m => /STOK_TIDAK_CUKUP/.test(m) ? 'Stok tidak cukup untuk jumlah ini' : m;
+const squeeze = async f => { const b = await createImageBitmap(f), k = Math.min(1, 1280 / Math.max(b.width, b.height));
+  const c = document.createElement('canvas'); c.width = b.width * k; c.height = b.height * k;
+  c.getContext('2d').drawImage(b, 0, 0, c.width, c.height);
+  return new Promise(r => c.toBlob(r, 'image/jpeg', .7)); };
+
+// ---- data ----
+async function loadP() {
+  try {
+    const {data, error} = await sb.from('products').select('id,sku,barcode,name,unit,ready_stock,min_stock').eq('is_active', true).order('name');
+    if (error) throw error;
+    S.products = data; await kvSet('products', data);
+  } catch (e) { S.products = (await kvGet('products')) || []; }
+  S.loading = false; if (S.user) { if (S.tab === 'stok') $('#list') && ($('#list').innerHTML = listHtml(S.q)); renderBar(); }
+}
+
+// ---- sinkronisasi antrean ----
+let syncing = false;
+async function send(it) {
+  const bad = e => { const m = e.message || String(e), x = new Error(m);
+    x.net = /fetch|network|load failed|timeout/i.test(m) || !navigator.onLine; return x; };
+  let path = null;
+  if (it.photo) {
+    path = `${S.user.id}/${it.client_id}.jpg`;
+    const {error} = await sb.storage.from('retur-photos').upload(path, it.photo, {contentType:'image/jpeg', upsert:true});
+    if (error) throw bad(error);
+  }
+  let {data, error} = await sb.from('transactions').insert({client_id:it.client_id, product_id:it.product_id, type:it.type,
+    qty:it.qty, counted_qty:it.counted_qty, note:it.note, user_id:S.user.id}).select('id').single();
+  if (error && error.code === '23505')   // sudah pernah masuk: anggap sukses
+    ({data, error} = await sb.from('transactions').select('id').eq('client_id', it.client_id).single());
+  if (error) throw bad(error);
+  if (it.type === 'RETUR') {
+    const {error: e2} = await sb.from('returns').insert({transaction_id:data.id, photo_path:path, reason:it.reason, layak_jual:it.layak});
+    if (e2 && e2.code !== '23505') throw bad(e2);
+  }
+}
+async function sync() {
+  if (syncing || !navigator.onLine || !S.user) return; syncing = true;
+  try {
+    for (const it of (await qAll()).sort((a, b) => a.ts - b.ts)) {
+      if (it.err) continue;
+      try { await send(it); await qDel(it.client_id); }
+      catch (e) { if (e.net) break; it.err = nice(e.message); await qPut(it); }
+    }
+  } finally { syncing = false; await loadP(); }
+}
+
+// ---- tampilan ----
+function loginView() {
+  $('#app').innerHTML = `<div class="login"><h2>Stok Gudang</h2><label>Email</label><input id="em" type="email" autocomplete="username">
+  <label>Kata sandi</label><input id="pw" type="password" autocomplete="current-password"><p class="err" id="le"></p>
+  <button class="save" data-a="login">Masuk</button></div>`;
+}
+function shell() {
+  $('#app').innerHTML = `<header><b>Stok Gudang</b><button class="pill" id="bar" data-a="queue"></button></header>
+  <main id="main"></main><nav>${TABS.map(([k,l,i]) => `<button data-a="tab" data-k="${k}" class="${S.tab===k?'on':''}"><span>${i}</span>${l}</button>`).join('')}</nav>`;
+  let y0 = null; const m = $('#main');
+  m.addEventListener('touchstart', e => { y0 = m.scrollTop === 0 ? e.touches[0].clientY : null; }, {passive:true});
+  m.addEventListener('touchend', e => { if (y0 !== null && e.changedTouches[0].clientY - y0 > 90) { toast('Memperbarui…'); sync().then(loadP); } y0 = null; });
+  renderTab(); renderBar();
+}
+async function renderBar() {
+  const b = $('#bar'); if (!b) return; const n = (await qAll()).length, on = navigator.onLine;
+  b.textContent = (on ? '● Online' : '○ Offline') + (n ? ` · ${n} antre` : ''); b.className = 'pill' + (on ? '' : ' off');
+}
+function listHtml(q) {
+  if (S.loading) return '<div class="sk"></div>'.repeat(5);
+  q = q.toLowerCase();
+  const r = S.products.filter(p => !q || p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q) || (p.barcode || '') === q);
+  if (!r.length) return '<p style="color:var(--mut)">Barang tidak ditemukan.</p>';
+  return r.slice(0, 60).map(p => `<button class="item" ${S.tab==='stok'?'':`data-a="pick" data-id="${p.id}"`}><div>${esc(p.name)}<small>${esc(p.sku)}</small></div>
+    <div class="stk ${p.ready_stock <= p.min_stock ? 'low' : ''}">${p.ready_stock} <small style="display:inline">${esc(p.unit)}</small></div></button>`).join('');
+}
+function renderTab() {
+  const t = S.tab, m = $('#main'); if (!m) return;
+  document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.k === t));
+  if (t === 'stok') { m.innerHTML = `<input id="sq" placeholder="Cari nama atau SKU" value="${esc(S.q)}"><div id="list">${listHtml(S.q)}</div>`; return; }
+  const p = S.sel;
+  m.innerHTML = `<h2>${TITLE[t]}</h2>` + (p
+    ? `<div class="card"><div><b>${esc(p.name)}</b><small>${esc(p.sku)} · stok sistem ${p.ready_stock} ${esc(p.unit)}</small></div><button data-a="clear">Ganti</button></div>`
+    : `<div class="row"><input id="fq" placeholder="Cari nama atau SKU"><button class="scan" data-a="scan" aria-label="Scan barcode">📷</button></div><div id="res"></div>`)
+  + `<label>${t === 'OPNAME' ? 'Hasil hitung fisik' : 'Jumlah'}</label>
+  <div class="step"><button data-a="dec" aria-label="Kurangi">−</button><input id="qty" type="number" inputmode="numeric" min="0" value="${S.qty}"><button data-a="inc" aria-label="Tambah">+</button></div>`
+  + (t === 'RETUR' ? `<label>Alasan retur</label><select id="reason"><option>Barang cacat</option><option>Salah kirim</option><option>Lainnya</option></select>
+  <label class="chk"><input type="checkbox" id="layak"> Layak dijual kembali</label>
+  <label class="photo"><input type="file" id="photo" accept="image/*" capture="environment">📷 Foto bukti <span id="pn">${S.photo ? '(terlampir ✓)' : '(wajib)'}</span></label>` : '')
+  + `<input id="note" placeholder="Catatan (opsional)"><button class="save" data-a="save">Simpan</button>`;
+}
+
+// ---- scan ----
+async function scan() {
+  if (!('BarcodeDetector' in window)) return toast('Scan belum didukung browser ini. Pakai pencarian.');
+  let st; try { st = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); } catch { return toast('Izin kamera ditolak'); }
+  const ov = document.createElement('div'); ov.className = 'ov';
+  ov.innerHTML = '<div class="sheet"><video playsinline muted></video><button class="ghost" data-a="stopscan">Tutup</button></div>'; document.body.append(ov);
+  const v = ov.querySelector('video'); v.srcObject = st; await v.play();
+  const det = new BarcodeDetector({formats:['ean_13','ean_8','upc_a','code_128','code_39','qr_code']});
+  const stop = () => { clearInterval(iv); st.getTracks().forEach(t => t.stop()); ov.remove(); }; ov._stop = stop;
+  const iv = setInterval(async () => { try { const r = await det.detect(v); if (!r.length) return;
+    const code = r[0].rawValue, p = S.products.find(x => x.barcode === code || x.sku === code);
+    if (p) { navigator.vibrate && navigator.vibrate(80); stop(); pick(p.id); } else toast('Kode ' + code + ' belum terdaftar'); } catch {} }, 350);
+}
+function pick(id) { S.sel = S.products.find(p => p.id === id); S.qty = S.tab === 'OPNAME' ? S.sel.ready_stock : 1; renderTab(); }
+
+// ---- simpan ----
+async function save() {
+  const t = S.tab, p = S.sel, q = parseInt($('#qty').value, 10);
+  if (!p) return toast('Pilih barang dulu');
+  if (isNaN(q) || q < (t === 'OPNAME' ? 0 : 1)) return toast('Jumlah tidak valid');
+  if (t === 'RETUR' && !S.photo) return toast('Foto bukti wajib untuk retur');
+  const ket = {MASUK:'Masuk', KELUAR:'Keluar', RETUR:'Retur', OPNAME:'Hasil hitung'}[t];
+  if (!confirm(`${ket} ${q} ${p.unit}\n${p.name} (${p.sku})\n\nSimpan?`)) return;
+  const it = {client_id:crypto.randomUUID(), product_id:p.id, name:p.name, type:t, note:$('#note').value.trim() || null, ts:Date.now()};
+  if (t === 'OPNAME') it.counted_qty = q; else it.qty = q;
+  if (t === 'RETUR') { it.reason = $('#reason').value; it.layak = $('#layak').checked; it.photo = S.photo; }
+  await qPut(it);
+  S.sel = null; S.photo = null; S.qty = 1; renderTab(); renderBar();
+  toast(navigator.onLine ? 'Tersimpan, mengirim…' : 'Tersimpan di antrean. Dikirim saat online.');
+  sync().then(renderBar);
+}
+
+// ---- antrean ----
+async function showQueue() {
+  const items = (await qAll()).sort((a, b) => a.ts - b.ts), ov = document.createElement('div'); ov.className = 'ov';
+  ov.innerHTML = `<div class="sheet"><h2>Antrean saya</h2>${items.length ? items.map(i => `<div class="q ${i.err ? 'bad' : ''}">
+    <b>${esc(i.type)}</b> · ${esc(i.name)} · ${i.qty ?? i.counted_qty}<br><small>${i.err ? 'Ditolak: ' + esc(i.err) : 'Menunggu dikirim'}</small>
+    <div class="row">${i.err ? `<button data-a="retry" data-id="${i.client_id}">Coba lagi</button>` : ''}<button data-a="del" data-id="${i.client_id}">Hapus</button></div></div>`).join('')
+    : '<p style="color:var(--mut)">Tidak ada transaksi yang menunggu.</p>'}<button class="ghost" data-a="close">Tutup</button></div>`;
+  document.body.append(ov);
+}
+
+// ---- aksi ----
+const act = {
+  async login() { $('#le').textContent = ''; const {error} = await sb.auth.signInWithPassword({email:$('#em').value.trim(), password:$('#pw').value});
+    if (error) $('#le').textContent = 'Email atau kata sandi salah'; },
+  tab(a) { S.tab = a.dataset.k; S.sel = null; S.photo = null; S.qty = 1; renderTab(); },
+  pick(a) { pick(a.dataset.id); }, clear() { S.sel = null; renderTab(); }, scan,
+  inc() { const i = $('#qty'); i.value = (parseInt(i.value, 10) || 0) + 1; },
+  dec() { const i = $('#qty'), min = S.tab === 'OPNAME' ? 0 : 1; i.value = Math.max(min, (parseInt(i.value, 10) || 0) - 1); },
+  save, queue: showQueue,
+  stopscan(a) { a.closest('.ov')._stop(); },
+  close(a) { a.closest('.ov').remove(); },
+  async retry(a) { const it = (await qAll()).find(x => x.client_id === a.dataset.id); delete it.err; await qPut(it); a.closest('.ov').remove(); sync().then(renderBar); },
+  async del(a) { if (confirm('Hapus transaksi ini dari antrean?')) { await qDel(a.dataset.id); a.closest('.ov').remove(); renderBar(); } }
+};
+document.addEventListener('click', e => { const a = e.target.closest('[data-a]'); if (a && act[a.dataset.a]) act[a.dataset.a](a); });
+document.addEventListener('input', e => {
+  if (e.target.id === 'sq') { S.q = e.target.value; $('#list').innerHTML = listHtml(S.q); }
+  if (e.target.id === 'fq') $('#res').innerHTML = e.target.value ? listHtml(e.target.value) : '';
+  if (e.target.id === 'qty') S.qty = e.target.value;
+});
+document.addEventListener('change', async e => {
+  if (e.target.id !== 'photo' || !e.target.files[0]) return;
+  S.photo = await squeeze(e.target.files[0]); $('#pn').textContent = '(terlampir ✓)';
+});
+addEventListener('online', () => { renderBar(); sync(); }); addEventListener('offline', renderBar);
+
+// ---- mulai ----
+async function enter(user) {
+  const {data: pf} = await sb.from('profiles').select('is_active').eq('id', user.id).maybeSingle();
+  if (pf && !pf.is_active) { await sb.auth.signOut(); return; }
+  S.user = user; shell(); await loadP(); sync();
+  sb.channel('stok').on('postgres_changes', {event:'*', schema:'public', table:'products'}, loadP).subscribe();
+}
+sb.auth.onAuthStateChange((ev, ses) => {
+  if (ev === 'SIGNED_OUT') { S.user = null; sb.removeAllChannels(); loginView(); }
+  else if (ses && !S.user) setTimeout(() => enter(ses.user), 0);
+});
+sb.auth.getSession().then(({data}) => {
+  if (data.session) return;
+  // Offline dengan token kedaluwarsa: buka aplikasi memakai sesi tersimpan; kirim ke server saat online lagi
+  let u = null;
+  try { u = JSON.parse(localStorage.getItem('sb-' + new URL(SB_URL).hostname.split('.')[0] + '-auth-token') || 'null')?.user; } catch {}
+  if (u && !navigator.onLine) { S.user = u; shell(); loadP(); } else loginView();
+});
+if ('serviceWorker' in navigator) addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+if (!SB_URL) document.addEventListener('DOMContentLoaded', () => toast('Isi SB_URL dan SB_KEY di index.html dulu'));
+</script>
+</body>
+</html>
