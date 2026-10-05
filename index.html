@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b5d4f">
+<meta name="theme-color" content="#0b4f45">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
@@ -12,69 +12,105 @@
 <meta name="apple-mobile-web-app-title" content="Stok">
 <title>Stok Gudang</title>
 <style>
-:root{--bg:#f5f6f2;--card:#fff;--ink:#16211c;--mut:#66726c;--line:#dfe3dc;--pri:#0b5d4f;--priS:#d9ece7;--bad:#b4350f;--badS:#fbe6dd}
+:root{--bg:#f3f5f4;--card:#fff;--ink:#14201c;--mut:#5f6d67;--line:#e0e5e2;--pri:#0b5d4f;--priD:#0b4f45;--priS:#e1f0ec;--bad:#b4350f;--badS:#fcebe4;--warn:#9a5b00;--warnS:#fdf1da;--t:#0b5d4f;--tS:#e1f0ec;--sh:0 1px 2px rgba(16,32,26,.06),0 1px 3px rgba(16,32,26,.04)}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{height:100%;margin:0}
-body{font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink)}
-#app{height:100dvh;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top)}
-header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;background:var(--pri);color:#fff}
-header b{font-size:18px}
-.pill{border:0;border-radius:99px;padding:6px 12px;font:inherit;font-size:14px;background:rgba(255,255,255,.18);color:#fff}
-.pill.off{background:#f6c9b6;color:#6b2308}
+body{font:16px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+.ic{flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#app{height:100dvh;display:flex;flex-direction:column;background:var(--bg)}
+header{display:flex;justify-content:space-between;align-items:center;padding:calc(10px + env(safe-area-inset-top)) 16px 10px;background:var(--priD);color:#fff}
+.brand{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:650;letter-spacing:.1px}
+.logo{width:34px;height:34px;border-radius:10px;background:rgba(255,255,255,.14);display:grid;place-items:center}
+.pill{display:flex;align-items:center;gap:7px;border:1px solid rgba(255,255,255,.22);border-radius:99px;padding:6px 12px;font:inherit;font-size:13px;font-weight:500;background:rgba(255,255,255,.1);color:#fff;min-height:34px}
+.pill .dot{width:8px;height:8px;border-radius:50%;background:#5ee0a8}
+.pill.off{background:var(--warnS);color:var(--warn);border-color:transparent}
+.pill.off .dot{background:var(--warn)}
 main{flex:1;overflow-y:auto;overscroll-behavior-y:contain;padding:16px}
 nav{display:grid;grid-template-columns:repeat(5,1fr);background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom)}
-nav button{border:0;background:none;padding:10px 0 8px;font:inherit;font-size:13px;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:2px;min-height:56px}
-nav button span{font-size:20px}
-nav button.on{color:var(--pri);font-weight:600;box-shadow:inset 0 3px var(--pri)}
-h2{margin:0 0 12px;font-size:20px}
-input,select{width:100%;font:inherit;padding:13px 14px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);margin-bottom:12px}
-label{display:block;font-size:14px;color:var(--mut);margin:4px 0 6px}
+nav button{border:0;background:none;padding:8px 0 7px;font:inherit;font-size:12px;font-weight:500;color:var(--mut);display:flex;flex-direction:column;align-items:center;gap:3px;min-height:58px;position:relative}
+nav button .pl{width:52px;height:28px;border-radius:99px;display:grid;place-items:center;transition:background .15s}
+nav button.on{color:var(--pri);font-weight:650}
+nav button.on .pl{background:var(--priS)}
+h2{margin:0;font-size:20px;font-weight:650;letter-spacing:-.2px}
+.ph{display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.chip{width:42px;height:42px;border-radius:12px;background:var(--tS);color:var(--t);display:grid;place-items:center}
+.sub{color:var(--mut);font-size:13px}
+input,select{width:100%;font:inherit;padding:13px 14px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--ink);margin-bottom:12px;min-height:50px}
+input:focus-visible,select:focus-visible,button:focus-visible,.photo:focus-within{outline:3px solid rgba(11,93,79,.3);outline-offset:1px;border-color:var(--pri)}
+label{display:block;font-size:14px;font-weight:500;color:var(--mut);margin:4px 0 6px}
 button{font:inherit;cursor:pointer}
-.row{display:flex;gap:8px}.row input{flex:1}
-.scan{width:56px;height:50px;border:1px solid var(--pri);background:var(--priS);border-radius:10px;font-size:22px}
-.item{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;padding:14px;margin-bottom:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--ink)}
-.item small{display:block;color:var(--mut)}
-.stk{font-size:20px;font-weight:700;white-space:nowrap}.stk.low{color:var(--bad)}
-.card{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;margin-bottom:16px;background:var(--priS);border-radius:12px}
-.card small{display:block;color:var(--mut)}
-.card button{border:0;background:none;color:var(--pri);font-weight:600;padding:8px}
-.step{display:grid;grid-template-columns:72px 1fr 72px;gap:10px;margin-bottom:16px}
-.step button{height:72px;font-size:36px;border:0;border-radius:14px;background:var(--pri);color:#fff}
-.step input{height:72px;margin:0;text-align:center;font-size:32px;font-weight:700}
+button:active{transform:scale(.98)}
+.sbox{position:relative}.sbox .ic{position:absolute;left:14px;top:15px;color:var(--mut);pointer-events:none}.sbox input{padding-left:44px}
+.row{display:flex;gap:8px}.row .sbox{flex:1}
+.scan{width:52px;height:50px;border:0;background:var(--pri);color:#fff;border-radius:12px;display:grid;place-items:center}
+.sum{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.sum div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 14px;box-shadow:var(--sh)}
+.sum b{display:block;font-size:22px;line-height:1.2}.sum span{font-size:13px;color:var(--mut)}
+.sum .lw b{color:var(--bad)}
+.item{display:flex;justify-content:space-between;align-items:center;gap:12px;width:100%;text-align:left;padding:13px 14px;margin-bottom:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;color:var(--ink);box-shadow:var(--sh);font-weight:500}
+.item small{display:block;color:var(--mut);font-weight:400;font-size:13px}
+.stk{text-align:right;font-size:19px;font-weight:700;white-space:nowrap;line-height:1.2}
+.stk small{display:inline;font-size:13px;font-weight:500}
+.stk.low{color:var(--bad)}
+.stk em{display:block;font-style:normal;font-size:11px;font-weight:600;background:var(--badS);color:var(--bad);border-radius:99px;padding:1px 8px;margin-top:3px}
+.card{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:14px;margin-bottom:16px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--t);border-radius:12px;box-shadow:var(--sh)}
+.card small{display:block;color:var(--mut);font-size:13px}
+.card button{border:1px solid var(--line);background:#fff;color:var(--pri);font-weight:600;padding:8px 14px;border-radius:10px;min-height:40px}
+.step{display:grid;grid-template-columns:64px 1fr 64px;gap:10px;margin-bottom:16px}
+.step button{height:64px;border:0;border-radius:14px;background:var(--priS);color:var(--pri);display:grid;place-items:center}
+.step input{height:64px;margin:0;text-align:center;font-size:30px;font-weight:700}
 .chk{display:flex;gap:10px;align-items:center;color:var(--ink);font-size:16px;margin:0 0 12px}
-.chk input{width:22px;height:22px;margin:0}
-.photo{display:flex;align-items:center;gap:8px;padding:14px;border:2px dashed var(--pri);border-radius:12px;color:var(--pri);font-size:16px;margin-bottom:12px}
-.photo input{display:none}
-.save{width:100%;height:58px;border:0;border-radius:14px;background:var(--pri);color:#fff;font-size:18px;font-weight:700;margin-top:4px}
+.chk input{width:22px;height:22px;margin:0;min-height:0;accent-color:var(--pri)}
+.photo{display:flex;align-items:center;gap:10px;padding:14px;border:1.5px dashed var(--pri);background:var(--priS);border-radius:12px;color:var(--pri);font-size:16px;font-weight:600;margin-bottom:12px}
+.photo input{display:none}.photo span{font-weight:400;color:var(--mut)}
+.save{width:100%;height:56px;border:0;border-radius:14px;background:var(--pri);color:#fff;font-size:17px;font-weight:650;margin-top:4px;display:flex;align-items:center;justify-content:center;gap:8px}
 .save:disabled{opacity:.5}
-.sk{height:68px;margin-bottom:8px;border-radius:12px;background:linear-gradient(90deg,#e8ebe5 25%,#f3f5f0 50%,#e8ebe5 75%);background-size:200% 100%;animation:sh 1.2s infinite}
+.sk{height:66px;margin-bottom:8px;border-radius:12px;background:linear-gradient(90deg,#e8ebe8 25%,#f4f6f4 50%,#e8ebe8 75%);background-size:200% 100%;animation:sh 1.2s infinite}
 @keyframes sh{to{background-position:-200% 0}}
-.login{margin:auto;width:min(360px,100%);padding:24px}
-.err{color:var(--bad);min-height:22px;margin:0 0 8px}
-.toast{position:fixed;left:16px;right:16px;bottom:84px;background:var(--ink);color:#fff;padding:12px 16px;border-radius:12px;z-index:30}
-.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:20;display:flex;align-items:flex-end}
-.sheet{background:var(--bg);width:100%;max-height:80dvh;overflow:auto;border-radius:18px 18px 0 0;padding:16px 16px calc(16px + env(safe-area-inset-bottom))}
+.login{margin:auto;width:min(380px,100%);padding:24px}
+.login .logo{width:56px;height:56px;border-radius:16px;background:var(--pri);color:#fff;margin-bottom:16px}
+.login h2{font-size:24px}.login .sub{margin:2px 0 20px;font-size:15px}
+.err{color:var(--bad);min-height:22px;margin:0 0 8px;font-size:14px}
+.toast{position:fixed;left:16px;right:16px;bottom:84px;background:var(--ink);color:#fff;padding:12px 16px;border-radius:12px;z-index:30;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.ov{position:fixed;inset:0;background:rgba(10,20,16,.55);z-index:20;display:flex;align-items:flex-end}
+.sheet{background:var(--bg);width:100%;max-height:80dvh;overflow:auto;border-radius:20px 20px 0 0;padding:18px 16px calc(16px + env(safe-area-inset-bottom))}
+.sheet h2{margin-bottom:12px}
 .sheet video{width:100%;border-radius:12px;background:#000;margin-bottom:12px}
 .q{padding:12px;margin-bottom:8px;background:var(--card);border:1px solid var(--line);border-radius:12px}
 .q.bad{border-color:var(--bad);background:var(--badS)}
-.q .row{margin-top:8px}.q .row button{flex:1;padding:10px;border-radius:8px;border:1px solid var(--line);background:#fff}
-.ghost{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff;margin-top:8px}
-@media(prefers-reduced-motion:reduce){.sk{animation:none}}
+.q .row{margin-top:8px}.q .row button{flex:1;padding:10px;border-radius:10px;border:1px solid var(--line);background:#fff;min-height:44px}
+.ghost{width:100%;padding:14px;border:1px solid var(--line);border-radius:12px;background:#fff;margin-top:8px;font-weight:600;color:var(--ink);min-height:50px}
+.empty{text-align:center;color:var(--mut);padding:32px 0}.empty .ic{opacity:.5;margin-bottom:6px}
+.t-MASUK{--t:#0b5d4f;--tS:#e1f0ec}.t-KELUAR{--t:#1d4f91;--tS:#e4edf9}.t-RETUR{--t:#9a5b00;--tS:#fdf1da}.t-OPNAME{--t:#5a3d91;--tS:#ece7f7}
+@media(prefers-reduced-motion:reduce){.sk{animation:none}button:active{transform:none}}
 </style>
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+<symbol id="i-package" viewBox="0 0 24 24"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><path d="m3.3 7 8.7 5 8.7-5"/><path d="m7.5 4.27 9 5.15"/></symbol>
+<symbol id="i-in" viewBox="0 0 24 24"><path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/></symbol>
+<symbol id="i-out" viewBox="0 0 24 24"><path d="m18 9-6-6-6 6"/><path d="M12 3v14"/><path d="M5 21h14"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5 5.5 5.5 0 0 1-5.5 5.5H11"/></symbol>
+<symbol id="i-clip" viewBox="0 0 24 24"><rect width="8" height="4" x="8" y="2" rx="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="m9 14 2 2 4-4"/></symbol>
+<symbol id="i-scan" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><path d="M8 7v10"/><path d="M12 7v10"/><path d="M17 7v10"/></symbol>
+<symbol id="i-cam" viewBox="0 0 24 24"><path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3z"/><circle cx="12" cy="13" r="3"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+<symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+</defs></svg>
 <div id="app"></div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
 <script>
-// ====== ISI DUA NILAI INI (Supabase > Project Settings > API) ======
 const SB_URL = 'https://xqvzbvdotavwmtybzsgc.supabase.co';
-const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxdnpidmRvdGF2d210eWJ6c2djIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExNzY2MTgsImV4cCI6MjEwNjc1MjYxOH0.DpfcAV6CdFPaGoBBGAP-InZ-d_chsNTpVK1rf43YHtQ';   // anon key (aman di frontend; data dilindungi RLS)
-// ===================================================================
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InhxdnpidmRvdGF2d210eWJ6c2djIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTExNzY2MTgsImV4cCI6MjEwNjc1MjYxOH0.DpfcAV6CdFPaGoBBGAP-InZ-d_chsNTpVK1rf43YHtQ';
 const sb = supabase.createClient(SB_URL || 'https://x.supabase.co', SB_KEY || 'x');
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-const TABS = [['stok','Stok','📦'],['MASUK','Masuk','⬇️'],['KELUAR','Keluar','⬆️'],['RETUR','Retur','↩️'],['OPNAME','Opname','📋']];
+const ic = (n, s = 22) => `<svg class="ic" width="${s}" height="${s}" aria-hidden="true"><use href="#i-${n}"/></svg>`;
+const TABS = [['stok','Stok','package'],['MASUK','Masuk','in'],['KELUAR','Keluar','out'],['RETUR','Retur','undo'],['OPNAME','Opname','clip']];
 const TITLE = {MASUK:'Barang masuk',KELUAR:'Barang keluar',RETUR:'Retur barang',OPNAME:'Stok opname'};
+const ICON = {MASUK:'in',KELUAR:'out',RETUR:'undo',OPNAME:'clip'};
 const S = {user:null, products:[], loading:true, tab:'stok', q:'', sel:null, qty:1, photo:null, authMode:'login'};
 
 // ---- IndexedDB: katalog cache + antrean offline ----
@@ -91,7 +127,7 @@ const qAll = () => idb('q','readonly',s => s.getAll()), qPut = i => idb('q','rea
 
 // ---- util ----
 let tt; const toast = m => { document.querySelectorAll('.toast').forEach(e => e.remove());
-  const d = document.createElement('div'); d.className = 'toast'; d.textContent = m; document.body.append(d);
+  const d = document.createElement('div'); d.className = 'toast'; d.setAttribute('role','status'); d.textContent = m; document.body.append(d);
   clearTimeout(tt); tt = setTimeout(() => d.remove(), 3200); };
 const nice = m => /STOK_TIDAK_CUKUP/.test(m) ? 'Stok tidak cukup untuk jumlah ini' : m;
 const squeeze = async f => { const b = await createImageBitmap(f), k = Math.min(1, 1280 / Math.max(b.width, b.height));
@@ -106,7 +142,7 @@ async function loadP() {
     if (error) throw error;
     S.products = data; await kvSet('products', data);
   } catch (e) { S.products = (await kvGet('products')) || []; }
-  S.loading = false; if (S.user) { if (S.tab === 'stok') $('#list') && ($('#list').innerHTML = listHtml(S.q)); renderBar(); }
+  S.loading = false; if (S.user) { if (S.tab === 'stok') { $('#list') && ($('#list').innerHTML = listHtml(S.q)); $('#sum') && ($('#sum').innerHTML = sumHtml()); } renderBar(); }
 }
 
 // ---- sinkronisasi antrean ----
@@ -122,7 +158,7 @@ async function send(it) {
   }
   let {data, error} = await sb.from('transactions').insert({client_id:it.client_id, product_id:it.product_id, type:it.type,
     qty:it.qty, counted_qty:it.counted_qty, note:it.note, user_id:S.user.id}).select('id').single();
-  if (error && error.code === '23505')   // sudah pernah masuk: anggap sukses
+  if (error && error.code === '23505')
     ({data, error} = await sb.from('transactions').select('id').eq('client_id', it.client_id).single());
   if (error) throw bad(error);
   if (it.type === 'RETUR') {
@@ -144,23 +180,23 @@ async function sync() {
 // ---- tampilan ----
 function loginView() {
   const reg = S.authMode === 'register';
-  $('#app').innerHTML = `<div class="login"><h2>Stok Gudang</h2>` + (reg ? `
+  $('#app').innerHTML = `<div class="login"><div class="logo">${ic('package', 28)}</div><h2>Stok Gudang</h2><p class="sub">${reg ? 'Buat akun untuk mulai mencatat stok.' : 'Masuk untuk mencatat stok barang.'}</p>` + (reg ? `
   <label>Nama</label><input id="rn" type="text" autocomplete="name">
   <label>Email</label><input id="rem" type="email" autocomplete="username">
   <label>Kata sandi</label><input id="rpw" type="password" autocomplete="new-password">
   <label>Ulangi kata sandi</label><input id="rpw2" type="password" autocomplete="new-password">
-  <p class="err" id="le"></p>
+  <p class="err" id="le" role="alert"></p>
   <button class="save" data-a="register">Daftar</button>
   <button class="ghost" data-a="toauth" data-m="login">Sudah punya akun? Masuk</button>` : `
   <label>Email</label><input id="em" type="email" autocomplete="username">
   <label>Kata sandi</label><input id="pw" type="password" autocomplete="current-password">
-  <p class="err" id="le"></p>
+  <p class="err" id="le" role="alert"></p>
   <button class="save" data-a="login">Masuk</button>
   <button class="ghost" data-a="toauth" data-m="register">Belum punya akun? Daftar</button>`) + `</div>`;
 }
 function shell() {
-  $('#app').innerHTML = `<header><b>Stok Gudang</b><button class="pill" id="bar" data-a="queue"></button></header>
-  <main id="main"></main><nav>${TABS.map(([k,l,i]) => `<button data-a="tab" data-k="${k}" class="${S.tab===k?'on':''}"><span>${i}</span>${l}</button>`).join('')}</nav>`;
+  $('#app').innerHTML = `<header><div class="brand"><span class="logo">${ic('package', 20)}</span>Stok Gudang</div><button class="pill" id="bar" data-a="queue"></button></header>
+  <main id="main"></main><nav>${TABS.map(([k,l,i]) => `<button data-a="tab" data-k="${k}" class="${S.tab===k?'on':''}"><span class="pl">${ic(i, 22)}</span>${l}</button>`).join('')}</nav>`;
   let y0 = null; const m = $('#main');
   m.addEventListener('touchstart', e => { y0 = m.scrollTop === 0 ? e.touches[0].clientY : null; }, {passive:true});
   m.addEventListener('touchend', e => { if (y0 !== null && e.changedTouches[0].clientY - y0 > 90) { toast('Memperbarui…'); sync().then(loadP); } y0 = null; });
@@ -168,30 +204,36 @@ function shell() {
 }
 async function renderBar() {
   const b = $('#bar'); if (!b) return; const n = (await qAll()).length, on = navigator.onLine;
-  b.textContent = (on ? '● Online' : '○ Offline') + (n ? ` · ${n} antre` : ''); b.className = 'pill' + (on ? '' : ' off');
+  b.innerHTML = `<i class="dot"></i>${on ? 'Online' : 'Offline'}${n ? ` · ${n} antre` : ''}`; b.className = 'pill' + (on ? '' : ' off');
+}
+function sumHtml() {
+  const low = S.products.filter(p => p.ready_stock <= p.min_stock).length;
+  return `<div><b>${S.products.length}</b><span>Jenis barang</span></div><div class="${low ? 'lw' : ''}"><b>${low}</b><span>Stok menipis</span></div>`;
 }
 function listHtml(q) {
   if (S.loading) return '<div class="sk"></div>'.repeat(5);
   q = q.toLowerCase();
   const r = S.products.filter(p => !q || p.name.toLowerCase().includes(q) || p.sku.toLowerCase().includes(q) || (p.barcode || '') === q);
-  if (!r.length) return '<p style="color:var(--mut)">Barang tidak ditemukan.</p>';
-  return r.slice(0, 60).map(p => `<button class="item" ${S.tab==='stok'?'':`data-a="pick" data-id="${p.id}"`}><div>${esc(p.name)}<small>${esc(p.sku)}</small></div>
-    <div class="stk ${p.ready_stock <= p.min_stock ? 'low' : ''}">${p.ready_stock} <small style="display:inline">${esc(p.unit)}</small></div></button>`).join('');
+  if (!r.length) return `<div class="empty">${ic('search', 32)}<br>Barang tidak ditemukan.<br><small>Coba kata kunci lain atau scan barcode.</small></div>`;
+  return r.slice(0, 60).map(p => { const low = p.ready_stock <= p.min_stock; return `<button class="item" ${S.tab==='stok'?'':`data-a="pick" data-id="${p.id}"`}><div>${esc(p.name)}<small>${esc(p.sku)}</small></div>
+    <div class="stk ${low ? 'low' : ''}">${p.ready_stock} <small>${esc(p.unit)}</small>${low ? '<em>Menipis</em>' : ''}</div></button>`; }).join('');
 }
 function renderTab() {
   const t = S.tab, m = $('#main'); if (!m) return;
   document.querySelectorAll('nav button').forEach(b => b.classList.toggle('on', b.dataset.k === t));
-  if (t === 'stok') { m.innerHTML = `<input id="sq" placeholder="Cari nama atau SKU" value="${esc(S.q)}"><div id="list">${listHtml(S.q)}</div>`; return; }
+  m.className = 't-' + t; m.scrollTop = 0;
+  if (t === 'stok') { m.innerHTML = `<div class="ph"><span class="chip">${ic('package', 22)}</span><div><h2>Daftar stok</h2><div class="sub">Stok terkini di gudang</div></div></div>
+    <div class="sum" id="sum">${sumHtml()}</div><div class="sbox">${ic('search', 20)}<input id="sq" type="search" placeholder="Cari nama atau SKU" value="${esc(S.q)}"></div><div id="list">${listHtml(S.q)}</div>`; return; }
   const p = S.sel;
-  m.innerHTML = `<h2>${TITLE[t]}</h2>` + (p
+  m.innerHTML = `<div class="ph"><span class="chip">${ic(ICON[t], 22)}</span><h2>${TITLE[t]}</h2></div>` + (p
     ? `<div class="card"><div><b>${esc(p.name)}</b><small>${esc(p.sku)} · stok sistem ${p.ready_stock} ${esc(p.unit)}</small></div><button data-a="clear">Ganti</button></div>`
-    : `<div class="row"><input id="fq" placeholder="Cari nama atau SKU"><button class="scan" data-a="scan" aria-label="Scan barcode">📷</button></div><div id="res"></div>`)
+    : `<div class="row"><div class="sbox">${ic('search', 20)}<input id="fq" type="search" placeholder="Cari nama atau SKU"></div><button class="scan" data-a="scan" aria-label="Scan barcode">${ic('scan', 24)}</button></div><div id="res"></div>`)
   + `<label>${t === 'OPNAME' ? 'Hasil hitung fisik' : 'Jumlah'}</label>
-  <div class="step"><button data-a="dec" aria-label="Kurangi">−</button><input id="qty" type="number" inputmode="numeric" min="0" value="${S.qty}"><button data-a="inc" aria-label="Tambah">+</button></div>`
+  <div class="step"><button data-a="dec" aria-label="Kurangi">${ic('minus', 26)}</button><input id="qty" type="number" inputmode="numeric" min="0" value="${S.qty}"><button data-a="inc" aria-label="Tambah">${ic('plus', 26)}</button></div>`
   + (t === 'RETUR' ? `<label>Alasan retur</label><select id="reason"><option>Barang cacat</option><option>Salah kirim</option><option>Lainnya</option></select>
   <label class="chk"><input type="checkbox" id="layak"> Layak dijual kembali</label>
-  <label class="photo"><input type="file" id="photo" accept="image/*" capture="environment">📷 Foto bukti <span id="pn">${S.photo ? '(terlampir ✓)' : '(wajib)'}</span></label>` : '')
-  + `<input id="note" placeholder="Catatan (opsional)"><button class="save" data-a="save">Simpan</button>`;
+  <label class="photo"><input type="file" id="photo" accept="image/*" capture="environment">${ic('cam', 22)} Foto bukti <span id="pn">${S.photo ? '(terlampir)' : '(wajib)'}</span></label>` : '')
+  + `<input id="note" placeholder="Catatan (opsional)"><button class="save" data-a="save">${ic('check', 22)} Simpan</button>`;
 }
 
 // ---- scan ----
@@ -199,7 +241,7 @@ async function scan() {
   if (!('BarcodeDetector' in window)) return toast('Scan belum didukung browser ini. Pakai pencarian.');
   let st; try { st = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}}); } catch { return toast('Izin kamera ditolak'); }
   const ov = document.createElement('div'); ov.className = 'ov';
-  ov.innerHTML = '<div class="sheet"><video playsinline muted></video><button class="ghost" data-a="stopscan">Tutup</button></div>'; document.body.append(ov);
+  ov.innerHTML = '<div class="sheet"><h2>Scan barcode</h2><video playsinline muted></video><button class="ghost" data-a="stopscan">Tutup</button></div>'; document.body.append(ov);
   const v = ov.querySelector('video'); v.srcObject = st; await v.play();
   const det = new BarcodeDetector({formats:['ean_13','ean_8','upc_a','code_128','code_39','qr_code']});
   const stop = () => { clearInterval(iv); st.getTracks().forEach(t => t.stop()); ov.remove(); }; ov._stop = stop;
@@ -232,7 +274,7 @@ async function showQueue() {
   ov.innerHTML = `<div class="sheet"><h2>Antrean saya</h2>${items.length ? items.map(i => `<div class="q ${i.err ? 'bad' : ''}">
     <b>${esc(i.type)}</b> · ${esc(i.name)} · ${i.qty ?? i.counted_qty}<br><small>${i.err ? 'Ditolak: ' + esc(i.err) : 'Menunggu dikirim'}</small>
     <div class="row">${i.err ? `<button data-a="retry" data-id="${i.client_id}">Coba lagi</button>` : ''}<button data-a="del" data-id="${i.client_id}">Hapus</button></div></div>`).join('')
-    : '<p style="color:var(--mut)">Tidak ada transaksi yang menunggu.</p>'}<button class="ghost" data-a="close">Tutup</button></div>`;
+    : `<div class="empty">${ic('check', 32)}<br>Semua transaksi sudah terkirim.</div>`}<button class="ghost" data-a="close">Tutup</button></div>`;
   document.body.append(ov);
 }
 
@@ -251,7 +293,6 @@ const act = {
     const {data, error} = await sb.auth.signUp({email, password: pw, options:{data:{name}}});
     if (error) return $('#le').textContent = /registered|exists/i.test(error.message) ? 'Email ini sudah terdaftar, coba masuk' : error.message;
     if (!data.session) { S.authMode = 'login'; loginView(); toast('Pendaftaran berhasil. Cek email untuk konfirmasi, lalu masuk.'); }
-    // kalau sesi langsung aktif (konfirmasi email dimatikan), onAuthStateChange akan otomatis masuk
   },
   tab(a) { S.tab = a.dataset.k; S.sel = null; S.photo = null; S.qty = 1; renderTab(); },
   pick(a) { pick(a.dataset.id); }, clear() { S.sel = null; renderTab(); }, scan,
@@ -271,7 +312,7 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('change', async e => {
   if (e.target.id !== 'photo' || !e.target.files[0]) return;
-  S.photo = await squeeze(e.target.files[0]); $('#pn').textContent = '(terlampir ✓)';
+  S.photo = await squeeze(e.target.files[0]); $('#pn').textContent = '(terlampir)';
 });
 addEventListener('online', () => { renderBar(); sync(); }); addEventListener('offline', renderBar);
 
@@ -288,7 +329,6 @@ sb.auth.onAuthStateChange((ev, ses) => {
 });
 sb.auth.getSession().then(({data}) => {
   if (data.session) return;
-  // Offline dengan token kedaluwarsa: buka aplikasi memakai sesi tersimpan; kirim ke server saat online lagi
   let u = null;
   try { u = JSON.parse(localStorage.getItem('sb-' + new URL(SB_URL).hostname.split('.')[0] + '-auth-token') || 'null')?.user; } catch {}
   if (u && !navigator.onLine) { S.user = u; shell(); loadP(); } else loginView();
